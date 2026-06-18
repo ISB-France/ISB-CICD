@@ -1,0 +1,67 @@
+when:
+  - event: push
+  - event: pull_request
+  - event: tag
+
+steps:
+  backend-tests:
+    image: python:3.12
+    when:
+      - path: apps/backend/**
+    commands:
+      - cd apps/backend
+      - pip install -r requirements.txt
+      - pytest --verbose
+
+  api-tests:
+    image: python:3.12
+    when:
+      - path: apps/api/**
+    commands:
+      - cd apps/api
+      - pip install -r requirements.txt
+      - pytest --verbose
+
+  frontend-tests:
+    image: node:22
+    when:
+      - path: apps/frontend/**
+    commands:
+      - cd apps/frontend
+      - npm ci
+      - npm test
+
+  docker-build-push:
+    image: woodpeckerci/plugin-docker-buildx
+    when:
+      - event: push
+        branch: main
+    settings:
+      registry: ghcr.io
+      repo: ghcr.io/${CI_REPO_OWNER}/${CI_REPO_NAME}
+      dockerfile: Dockerfile
+      context: .
+      tags: latest
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+    secrets:
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
+
+  deploy-dev:
+    image: appleboy/drone-ssh
+    when:
+      - event: push
+        branch: main
+    settings:
+      host: ${DEV_SERVER_HOST}
+      username: ${DEV_SERVER_USER}
+      key: ${DEV_SERVER_SSH_KEY}
+      script:
+        - cd /opt/${CI_REPO_NAME}
+        - docker compose pull
+        - docker compose up -d --remove-orphans
+    secrets:
+      - DEV_SERVER_HOST
+      - DEV_SERVER_USER
+      - DEV_SERVER_SSH_KEY
