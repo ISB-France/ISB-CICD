@@ -109,9 +109,11 @@ Fichier : `.woodpecker.yml`
 
 | Étape | Déclencheur | Action |
 |-------|-------------|--------|
-| Tests | push, PR | Tests unitaires (Python avec pytest, Node.js avec npm test) |
-| Build Docker | push sur main | Build et push vers GitHub Container Registry (ghcr.io) |
-| Déploiement | push sur main | SSH sur le serveur dev et `docker compose up -d` |
+| Tests | push, PR | Tests unitaires (pytest, npm test) selon les dossiers modifiés |
+| Build Docker backend | push sur main | Build + push `-backend:latest` vers ghcr.io |
+| Build Docker api | push sur main | Build + push `-api:latest` vers ghcr.io |
+| Build Docker frontend | push sur main | Build + push `-frontend:latest` vers ghcr.io |
+| Déploiement | push sur main | SSH, pull des images, `docker compose up -d` |
 
 ### Variables secrètes à configurer dans Woodpecker
 

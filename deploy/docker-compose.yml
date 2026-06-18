@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}:latest
+    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}-backend:latest
     container_name: backend
     restart: unless-stopped
     ports:
@@ -11,7 +11,7 @@ services:
       - app-net
 
   api:
-    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}:latest
+    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}-api:latest
     container_name: api
     restart: unless-stopped
     ports:
@@ -22,7 +22,7 @@ services:
       - app-net
 
   frontend:
-    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}:latest
+    image: ghcr.io/${GITHUB_OWNER}/${REPO_NAME}-frontend:latest
     container_name: frontend
     restart: unless-stopped
     ports:

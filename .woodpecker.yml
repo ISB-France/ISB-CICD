@@ -31,16 +31,50 @@ steps:
       - npm ci
       - npm test
 
-  docker-build-push:
+  docker-build-backend:
     image: woodpeckerci/plugin-docker-buildx
     when:
       - event: push
         branch: main
     settings:
       registry: ghcr.io
-      repo: ghcr.io/${CI_REPO_OWNER}/${CI_REPO_NAME}
-      dockerfile: Dockerfile
-      context: .
+      repo: ghcr.io/${CI_REPO_OWNER}/${CI_REPO_NAME}-backend
+      dockerfile: apps/backend/Dockerfile
+      context: apps/backend
+      tags: latest
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+    secrets:
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
+
+  docker-build-api:
+    image: woodpeckerci/plugin-docker-buildx
+    when:
+      - event: push
+        branch: main
+    settings:
+      registry: ghcr.io
+      repo: ghcr.io/${CI_REPO_OWNER}/${CI_REPO_NAME}-api
+      dockerfile: apps/api/Dockerfile
+      context: apps/api
+      tags: latest
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+    secrets:
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
+
+  docker-build-frontend:
+    image: woodpeckerci/plugin-docker-buildx
+    when:
+      - event: push
+        branch: main
+    settings:
+      registry: ghcr.io
+      repo: ghcr.io/${CI_REPO_OWNER}/${CI_REPO_NAME}-frontend
+      dockerfile: apps/frontend/Dockerfile
+      context: apps/frontend
       tags: latest
       username: ${DOCKER_USERNAME}
       password: ${DOCKER_PASSWORD}
@@ -58,7 +92,10 @@ steps:
       username: ${DEV_SERVER_USER}
       key: ${DEV_SERVER_SSH_KEY}
       script:
+        - mkdir -p /opt/${CI_REPO_NAME}
         - cd /opt/${CI_REPO_NAME}
+        - curl -o docker-compose.yml https://raw.githubusercontent.com/${CI_REPO_OWNER}/${CI_REPO_NAME}/main/deploy/docker-compose.yml
+        - curl -o .env https://raw.githubusercontent.com/${CI_REPO_OWNER}/${CI_REPO_NAME}/main/deploy/.env.example
         - docker compose pull
         - docker compose up -d --remove-orphans
     secrets:
