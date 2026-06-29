@@ -10,18 +10,14 @@ steps:
     when:
       - path: apps/backend/**
     commands:
-      - cd apps/backend
-      - pip install -r requirements.txt
-      - PYTHONPATH=. pytest --verbose
+      - cd apps/backend && pip install -r requirements.txt && python -m pytest --verbose
 
   api-tests:
     image: python:3.12
     when:
       - path: apps/api/**
     commands:
-      - cd apps/api
-      - pip install -r requirements.txt
-      - PYTHONPATH=. pytest --verbose
+      - cd apps/api && pip install -r requirements.txt && python -m pytest --verbose
 
   frontend-tests:
     image: node:22
