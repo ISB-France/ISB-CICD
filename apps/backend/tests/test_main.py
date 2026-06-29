@@ -1,18 +1,16 @@
-from httpx import Client, ASGITransport
+from fastapi.testclient import TestClient
 from src.main import app
+
+client = TestClient(app)
 
 
 def test_health():
-    transport = ASGITransport(app=app)
-    with Client(transport=transport, base_url="http://test") as client:
-        response = client.get("/health")
-        assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
 
 
 def test_root():
-    transport = ASGITransport(app=app)
-    with Client(transport=transport, base_url="http://test") as client:
-        response = client.get("/")
-        assert response.status_code == 200
-        assert response.json()["service"] == "backend"
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json()["service"] == "backend"
