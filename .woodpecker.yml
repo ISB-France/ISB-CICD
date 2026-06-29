@@ -3,6 +3,7 @@ when:
   - event: push
   - event: pull_request
   - event: tag
+  - event: manual
 
 steps:
   backend-tests:
@@ -12,7 +13,7 @@ steps:
     commands:
       - cd apps/backend
       - pip install -r requirements.txt
-      - pytest --verbose
+      - PYTHONPATH=. pytest --verbose
 
   api-tests:
     image: python:3.12
@@ -21,7 +22,7 @@ steps:
     commands:
       - cd apps/api
       - pip install -r requirements.txt
-      - pytest --verbose
+      - PYTHONPATH=. pytest --verbose
 
   frontend-tests:
     image: node:22
