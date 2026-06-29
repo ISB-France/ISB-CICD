@@ -8,21 +8,27 @@ steps:
   backend-tests:
     image: python:3.12
     when:
-      - path: apps/backend/**
+      - event: [push, pull_request, tag]
+        path: apps/backend/**
+      - event: manual
     commands:
       - cd apps/backend && pip install -r requirements.txt && python -m pytest --verbose
 
   api-tests:
     image: python:3.12
     when:
-      - path: apps/api/**
+      - event: [push, pull_request, tag]
+        path: apps/api/**
+      - event: manual
     commands:
       - cd apps/api && pip install -r requirements.txt && python -m pytest --verbose
 
   frontend-tests:
     image: node:22
     when:
-      - path: apps/frontend/**
+      - event: [push, pull_request, tag]
+        path: apps/frontend/**
+      - event: manual
     commands:
       - cd apps/frontend
       - npm ci
